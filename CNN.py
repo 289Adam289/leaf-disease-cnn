@@ -25,28 +25,42 @@ class CNN:
             # print(X)
         return X
 
-    def train(self, report = False):
+    def train(self, batch_size = 16, report = False):
         
         for epoch in range(self.epochs):
-            error=  0
+            error = 0
             count = 0
             if report:
                 progress = tqdm(range(self.X_train.shape[0]))
                 progress.set_description(f"Training epoch {epoch+1}/{self.epochs}")
 
-
+            batch = 0
+            batchX = np.zeros((batch_size, self.X_train.shape[1], self.X_train.shape[2], self.X_train.shape[3]))
+            batchY = np.zeros((batch_size, self.y_train.shape[1], self.y_train.shape[2]))
             for x,y in zip(self.X_train, self.y_train):
                 if report:
                     progress.update(1)
 
-                pred = self.predict(x)
-                error += self.loss.forward(y, pred)
-                count += np.argmax(pred) == np.argmax(y)
-                grad = self.loss.backward(y, pred)
-                # print(f'grad {grad}')
-                for layer in reversed(self.layers):
-                    grad = layer.backward(grad, self.rate)
-                    # print(f'grad {grad}')
+                batchX[batch] = x
+                batchY[batch] = y
+                batch += 1
+                
+                if batch == batch_size:
+                    batch = 0
+
+                    pred = self.predict(batchX)
+                    for i in range(batch_size):
+                        error += self.loss.forward(batchY[i], pred[i])
+                    for i in range(batch_size):
+                        count += np.argmax(pred[i]) == np.argmax(batchY[i])
+
+
+                    grad = [[] for _ in range(batch_size)]
+                    for i in range(batch_size):
+                        grad[i] = self.loss.backward(batchY[i], pred[i])
+                    grad = np.array(grad)
+                    for layer in reversed(self.layers):
+                        grad = layer.backward(grad, self.rate)
 
             if report:
                 progress.close()

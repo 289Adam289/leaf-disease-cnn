@@ -6,7 +6,7 @@ from activation import Activation, SoftMax
 
 class Dense:
 
-    def __init__(self, input_size , output_size, activation = "relu"):
+    def __init__(self, input_size, output_size, activation = "relu"):
         self.input_size = input_size
         self.output_size = output_size
         self.activation = activation
@@ -19,16 +19,29 @@ class Dense:
         # self.bias = np.zeros((output_size, 1))
 
     def forward(self, X):
+        batch_size = X.shape[0]
         self.X = X
-        tmp = np.dot(self.weights, X) + self.bias
-        tmp = self.activator.forward(tmp)
+        tmp = np.zeros((batch_size, self.output_size, 1))
+        for i in range(batch_size):
+           tmp[i] = np.dot(self.weights, X[i]) + self.bias
+           tmp[i] = self.activator.forward(tmp[i])
+        # tmp = np.dot(self.weights, X) + self.bias
+        # tmp = self.activator.forward(tmp)
         return tmp
     
-    def backward(self,grad, rate):
-        grad = self.activator.backward(grad, rate)
-        self.weights -= rate * np.dot(grad, self.X.T)
-        self.bias -= rate * grad
-        return np.dot(self.weights.T, grad)
+    def backward(self, grad, rate):
+        batch_size = grad.shape[0]
+        # tmp2 = np.zeros((batch_size, self.input_size))
+        tmp = [None for _ in range(batch_size)]
+        for i in range(batch_size):
+            tmp[i] = grad[i]
+            tmp[i] = self.activator.backward(tmp[i], rate)
+            self.weights -= rate * np.dot(tmp[i], self.X[i].T)
+            self.bias -= rate * tmp[i]
+            tmp[i] = np.dot(self.weights.T, tmp[i])
+        tmp = np.array(tmp)
+
+        return tmp
     
     def initialize(self):
         divisor = 1
@@ -70,28 +83,50 @@ class Convolutional:
         
         
     def forward(self, X):
+        batch_size = X.shape[0]
         self.X = X
-        self.output = np.zeros((self.new_channels, self.new_height, self.new_width))
-        for nc in range(self.new_channels):
-            for c in range(self.channels):
-                self.output[nc] += correlate2d(X[c], self.kernels[nc, c], "valid")
-            self.output[nc] += self.bias[nc]
-        
-        self.output = self.activator.forward(self.output)
+        self.output = np.zeros((batch_size, self.new_channels, self.new_height, self.new_width))
+        for i in range(batch_size):
+            for nc in range(self.new_channels):
+                for c in range(self.channels):
+                    self.output[i, nc] += correlate2d(X[i, c], self.kernels[nc, c], "valid")
+                self.output[i, nc] += self.bias[nc]
+            self.output[i] = self.activator.forward(self.output[i])
         return self.output
+        # for nc in range(self.new_channels):
+        #     for c in range(self.channels):
+        #         self.output[nc] += correlate2d(X[c], self.kernels[nc, c], "valid")
+        #     self.output[nc] += self.bias[nc]
+        
+        # self.output = self.activator.forward(self.output)
+        # return self.output
     
     def backward(self, grad, rate):
-        grad = self.activator.backward(grad, rate)
-        grad_input = np.zeros(self.X.shape) 
-        grad_kernels = np.zeros(self.kernels.shape)
-        grad_bias = np.zeros(self.bias.shape)
-        for nc in range(self.new_channels):
-            grad_bias[nc] = np.sum(grad[nc])
-            for c in range(self.channels):
-                grad_kernels[nc, c] = correlate2d(self.X[c], grad[nc], "valid")
-                grad_input[c] += correlate2d(grad[nc], np.rot90(self.kernels[nc, c],2), "full")
-        self.update_wieghts(rate, grad_kernels, grad_bias)
+        batch_size = grad.shape[0]
+
+        grad_input = np.zeros((batch_size,) + self.X.shape)
+        grad_kernels = np.zeros((batch_size,) + self.kernels.shape)
+        grad_bias = np.zeros((batch_size,) + self.bias.shape)
+
+        for i in range(batch_size):
+            for nc in range(self.new_channels):
+                grad_bias[i, nc] = np.sum(grad[i, nc])
+                for c in range(self.channels):
+                    grad_kernels[i, nc, c] = correlate2d(self.X[i, c], grad[i, nc], "valid")
+                    grad_input[i, c] += correlate2d(grad[i, nc], np.rot90(self.kernels[nc, c], 2), "full")
+            self.update_wieghts(rate, grad_kernels[i], grad_bias[i])
         return grad_input
+        # grad = self.activator.backward(grad, rate)
+        # grad_input = np.zeros(self.X.shape) 
+        # grad_kernels = np.zeros(self.kernels.shape)
+        # grad_bias = np.zeros(self.bias.shape)
+        # for nc in range(self.new_channels):
+        #     grad_bias[nc] = np.sum(grad[nc])
+        #     for c in range(self.channels):
+        #         grad_kernels[nc, c] = correlate2d(self.X[c], grad[nc], "valid")
+        #         grad_input[c] += correlate2d(grad[nc], np.rot90(self.kernels[nc, c],2), "full")
+        # self.update_wieghts(rate, grad_kernels, grad_bias)
+        # return grad_input
     
     def initialize(self):
         divisor = 1
