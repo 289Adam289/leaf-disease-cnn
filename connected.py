@@ -14,7 +14,7 @@ class Dense:
             self.activator = SoftMax()
         else:
             self.activator = Activation(activation)
-        self.inizialize()
+        self.initialize()
         # self.weights = np.zeros((output_size, input_size))
         # self.bias = np.zeros((output_size, 1))
 
@@ -30,7 +30,7 @@ class Dense:
         self.bias -= rate * grad
         return np.dot(self.weights.T, grad)
     
-    def inizialize(self):
+    def initialize(self):
         divisor = 1
         if self.activation == "relu" or "softmax":
             divisor = self.input_size
@@ -38,6 +38,15 @@ class Dense:
             divisor = self.input_size + self.output_size
         self.weights = np.random.randn(self.output_size, self.input_size)/divisor
         self.bias = np.random.randn(self.output_size, 1)/divisor
+    
+    def number_of_parameters(self):
+        return self.input_size * self.output_size + self.output_size
+    
+    def save(self):
+        return np.append(self.weights.flatten(), self.bias.flatten())
+    def load(self, record):
+        self.weights = record[:self.input_size*self.output_size].reshape(self.output_size, self.input_size)
+        self.bias = record[self.input_size*self.output_size:].reshape(self.output_size, 1)
 
         
 
@@ -98,3 +107,15 @@ class Convolutional:
     def update_wieghts(self, rate, kernel, bias):
         self.kernels -= rate * kernel
         self.bias -= rate * bias
+
+    def number_of_parameters(self):
+        return self.new_channels * self.channels * self.kernel_size * self.kernel_size \
+                + self.new_channels*self.new_height*self.new_width
+    
+    def save(self):
+        return np.append(self.kernels.flatten(), self.bias.flatten())
+    
+    def load(self, record):
+        tmp = self.new_channels * self.channels * self.kernel_size * self.kernel_size
+        self.kernels = record[:tmp].reshape(self.new_channels, self.channels, self.kernel_size, self.kernel_size)
+        self.bias = record[tmp:].reshape(self.new_channels, self.new_height, self.new_width)

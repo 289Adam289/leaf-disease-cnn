@@ -12,6 +12,9 @@ class Flatten:
 
     def backward(self, output_gradient, learning_rate):
         return np.reshape(output_gradient, self.input_shape)
+
+    def number_of_parameters(self):
+        return 0
     
 class MaxPooling:
 
@@ -54,7 +57,9 @@ class MaxPooling:
                         for w in range(w_start, w_end):
                             if self.X[c, h, w] == self.output[c,i,j]:
                                 dX[c, h, w] += rate*grad[c, i, j]
-        
         return dX
+    
+    def number_of_parameters(self):
+        return 0
 
 

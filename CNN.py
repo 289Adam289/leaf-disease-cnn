@@ -53,12 +53,33 @@ class CNN:
                 print(f"Error: {error/self.X_train.shape[0]}")
                 print(f"Traigning accuracy: {count/self.X_train.shape[0]}")
                 print("\n")
-    #TODO: Implement save and load methods
-    def save(self, path):
+    
+    def number_of_parameters(self):
+        print([layer.number_of_parameters() for layer in self.layers])
+        return sum([layer.number_of_parameters() for layer in self.layers])
+    
+    def stats(self):
         pass
 
+    def reset(self):
+        for layer in self.layers:
+            if layer.number_of_parameters() != 0:
+                layer.initialize()
+
+    def save(self, path):
+        record = np.array([])
+        for layer in self.layers:
+            if layer.number_of_parameters() != 0:
+                record = np.append(record, layer.save())
+        np.save(path, record)
+
     def load(self, path):
-        pass
+        record = np.load(path, allow_pickle=True)
+        index = 0
+        for layer in self.layers:
+            if layer.number_of_parameters() != 0:
+                layer.load(record[index: index + layer.number_of_parameters()])
+                index += layer.number_of_parameters()
 
 
 
