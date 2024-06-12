@@ -25,8 +25,9 @@ class CNN:
             # print(X)
         return X
 
-    def train(self, batch_size = 16, report = False):
+    def train(self, batch_size = 16, report = False, snapshot = False):
         
+        best_accuracy = 0
         for epoch in range(self.epochs):
             error = 0
             count = 0
@@ -62,11 +63,25 @@ class CNN:
                     for layer in reversed(self.layers):
                         grad = layer.backward(grad, self.rate)
 
+            val_accuracy = 0
+            if self.X_val is not None:
+                for x,y in zip(self.X_val, self.y_val):
+                    pred = self.predict(np.array([x]))
+                    val_accuracy += np.argmax(pred[0]) == np.argmax(y)
+                val_accuracy /= self.X_val.shape[0]
+
             if report:
                 progress.close()
                 print(f"Error: {error/self.X_train.shape[0]}")
                 print(f"Traigning accuracy: {count/self.X_train.shape[0]}")
+                if self.X_val is not None:
+                    print(f"Validation accuracy: {val_accuracy}")
                 print("\n")
+            if snapshot:
+                if val_accuracy > best_accuracy:
+                    best_accuracy = val_accuracy
+                    self.save("best_snapshot.npy")
+
     
     def number_of_parameters(self):
         print([layer.number_of_parameters() for layer in self.layers])

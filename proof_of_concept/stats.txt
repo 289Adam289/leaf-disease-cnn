@@ -1,0 +1,18 @@
+95% validation accuracy model
+
+validation split 80/20
+
+network:
+layers.Conv2D(32, (3, 3), activation='relu', input_shape=(128, 128, 3)),
+layers.MaxPooling2D((2, 2)),
+layers.Conv2D(64, (3, 3), activation='relu'),
+layers.MaxPooling2D((2, 2)),
+layers.Conv2D(128, (3, 3), activation='relu'),
+layers.MaxPooling2D((2, 2)),
+layers.Conv2D(256, (3, 3), activation='relu'),
+layers.BatchNormalization(),
+layers.MaxPooling2D((2, 2)),
+layers.Flatten(),
+layers.Dense(512, activation='relu'),
+layers.Dropout(0.5),
+layers.Dense(num_classes, activation='softmax')
