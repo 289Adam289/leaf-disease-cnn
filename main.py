@@ -11,32 +11,41 @@ import data
 print(f"x_train shape: {x_train.shape}")
 print(f"y_train shape: {y_train.shape}")
 
-network = [
-    Convolutional((3, 128, 128), 3, 5, activation="relu"),     # 128 -> 126
-    MaxPooling((5, 126, 126), 2, 2),                          # 126 -> 63
-    Convolutional((5, 63, 63), 4, 10, activation="relu"),      # 63 -> 60
-    MaxPooling((10, 60, 60), 2, 2),                           # 60 -> 30
-    Convolutional((10, 30, 30), 3, 12, activation="relu"),      # 30 -> 28
-    MaxPooling((12, 28, 28), 2, 2),                            # 28 -> 14
-    Flatten((12,14,14)),
-    Dense(12*14*14, 50, activation="relu"),
-    Dense(50, 4, activation="softmax")
-]
+# network = [
+#     Convolutional((3, 128, 128), 3, 5, activation="relu"),     # 128 -> 126
+#     MaxPooling((5, 126, 126), 2, 2),                          # 126 -> 63
+#     Convolutional((5, 63, 63), 4, 10, activation="relu"),      # 63 -> 60
+#     MaxPooling((10, 60, 60), 2, 2),                           # 60 -> 30
+#     Convolutional((10, 30, 30), 3, 12, activation="relu"),      # 30 -> 28
+#     MaxPooling((12, 28, 28), 2, 2),                            # 28 -> 14
+#     Flatten((12,14,14)),
+#     Dense(12*14*14, 50, activation="relu"),
+#     Dense(50, 4, activation="softmax")
+# ]
 
 # network = [
-#     Convolutional((3, 128, 128), 3, 5, activation="relu"),
-#     MaxPooling((5, 126, 126), 2, 2),
-#     Convolutional((5, 63, 63), 4, 8, activation="relu"),
-#     MaxPooling((8, 60, 60), 2, 2),
-#     Flatten((8, 30, 30)),
-#     Dense(8*30*30, 40, activation="relu"),
-#     Dense(40, 4, activation="softmax")
+#     Convolutional((3, 128, 128), 3, 3, activation="relu"),
+#     MaxPooling((3, 126, 126), 21, 21),
+#     Flatten((3, 6, 6)),
+#     Dense(3*6*6, 20, activation="relu"),
+#     Dense(20, 4, activation="softmax")
 # ]
+
+network = [
+    Convolutional((3, 128, 128), 5, 5, activation="relu"),
+    MaxPooling((5, 124, 124), 4, 4),
+    Convolutional((5, 31, 31), 4, 5, activation="relu"),
+    MaxPooling((5, 28, 28), 2, 2),
+    Convolutional((5,14,14), 3, 10),
+    MaxPooling((10,12,12),4,4),
+    Flatten((10, 3, 3)),
+    Dense(10*3*3, 15, activation="relu"),
+    Dense(15, 4, activation="softmax")
+]
 
 soft = SoftMax()
 
 model = CNN(network)
-#model.load('little_epoch_0_1.npy')
 model.fit(x_train, y_train, None, None, Loss("crossentropy"), epochs=20, rate=0.1)
 model.train(report=True)
 
