@@ -10,7 +10,7 @@ def load_image(image_path):
     img_array = img_to_array(img)
     print(img_array.shape)
     img_array = np.expand_dims(img_array, axis=0)
-    img_array /= 255.0  # Normalizacja obrazu
+    img_array /= 255.0
     return img_array
 
 
@@ -21,7 +21,7 @@ def predict(image_path, model, class_names):
     return class_names[predicted_class[0]]
 
 if __name__ == "__main__":
-    
+
     image_path = sys.argv[1]
     class_names = ['healthy', 'rust', 'scab']
 

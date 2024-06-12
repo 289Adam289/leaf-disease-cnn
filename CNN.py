@@ -17,6 +17,7 @@ class CNN:
         self.epochs = epochs
         self.loss = loss
         self.rate = rate
+        self.best_accuracy = 0
 
     def predict(self, X):
         # print(X)
@@ -27,7 +28,7 @@ class CNN:
 
     def train(self, batch_size = 16, report = False, snapshot = False):
         
-        best_accuracy = 0
+        self.best_accuracy = 0
         for epoch in range(self.epochs):
             error = 0
             count = 0
@@ -78,8 +79,8 @@ class CNN:
                     print(f"Validation accuracy: {val_accuracy}")
                 print("\n")
             if snapshot:
-                if val_accuracy > best_accuracy:
-                    best_accuracy = val_accuracy
+                if val_accuracy > self.best_accuracy:
+                    self.best_accuracy = val_accuracy
                     self.save("best_snapshot.npy")
 
     
