@@ -25,7 +25,11 @@ if __name__ == "__main__":
     image_path = sys.argv[1]
     class_names = ['healthy', 'rust', 'scab']
 
+    print("haha")
+
     model = tf.keras.models.load_model('simple_cnn_leaf_classifier2.h5')
+
+    print("haha")
 
     prediction = predict(image_path, model, class_names)
     print(f'Predicted class: {prediction}')

@@ -63,6 +63,7 @@ class CNN:
                     grad = np.array(grad)
                     for layer in reversed(self.layers):
                         grad = layer.backward(grad, self.rate)
+                        # print(type(layer).__name__,grad.shape)
 
             val_accuracy = 0
             if self.X_val is not None:

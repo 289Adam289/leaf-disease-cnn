@@ -104,7 +104,7 @@ class Convolutional:
     def backward(self, grad, rate):
         batch_size = grad.shape[0]
 
-        grad_input = np.zeros((batch_size,) + self.X.shape)
+        grad_input = np.zeros(self.X.shape) # bylo (batch_size,) + self.X.shape
         grad_kernels = np.zeros((batch_size,) + self.kernels.shape)
         grad_bias = np.zeros((batch_size,) + self.bias.shape)
 
