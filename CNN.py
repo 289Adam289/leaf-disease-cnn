@@ -26,7 +26,7 @@ class CNN:
             # print(X)
         return X
 
-    def train(self, batch_size = 16, report = False, snapshot = False):
+    def train(self, batch_size = 8, report = False, snapshot = False):
         
         self.best_accuracy = 0
         for epoch in range(self.epochs):
