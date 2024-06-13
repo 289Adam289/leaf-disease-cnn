@@ -43,7 +43,7 @@ class CNN:
         self.best_accuracy = 0
         for epoch in range(self.epochs):
 
-            self.shuffle()
+            #self.shuffle()
 
             error = 0
             count = 0

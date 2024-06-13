@@ -3,22 +3,22 @@ import numpy as np
 from PIL import Image
 from sklearn.model_selection import train_test_split
 
-def load_images_from_folder(folder, image_size=(128, 128)):
+def load_images_from_folder(folder, image_size=(16, 16)):
     images = []
     for filename in os.listdir(folder):
         img_path = os.path.join(folder, filename)
         try:
             with Image.open(img_path) as img:
-                img = img.resize(image_size)  #RGB
+                img = img.resize(image_size)
                 img_array = np.array(img)
                 if img_array.shape == (image_size[0], image_size[1], 3):
-                    img_array = np.transpose(img_array, (2, 0, 1))  #(3, 128, 128)
+                    img_array = np.transpose(img_array, (2, 0, 1)) 
                     images.append(img_array)
         except Exception as e:
             print(f"Error loading image {filename}: {e}")
     return np.array(images)
 
-data_dir = './../data'
+data_dir = './../nice_leaves'
 
 def process_data():
 
@@ -35,13 +35,15 @@ def process_data():
     x_test_list = []
     y_test_list = []
 
+    classes_no = len(class_folders)
+
     for class_idx, images in enumerate(class_images):
         if len(images) > 0:
             x_train, x_test = train_test_split(images, test_size=0.2, random_state=42)
             x_train_list.extend(x_train)
-            y_train_list.extend([np.eye(4)[class_idx][:, np.newaxis]] * len(x_train))
+            y_train_list.extend([np.eye(classes_no)[class_idx][:, np.newaxis]] * len(x_train))
             x_test_list.extend(x_test)
-            y_test_list.extend([np.eye(4)[class_idx][:, np.newaxis]] * len(x_test))
+            y_test_list.extend([np.eye(classes_no)[class_idx][:, np.newaxis]] * len(x_test))
 
     x_train = np.array(x_train_list)
     y_train = np.array(y_train_list)
@@ -54,15 +56,18 @@ def process_data():
     x_train = x_train[indices]
     y_train = y_train[indices]
 
-    np.savez('./../processed_data.npz', x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
+    print(x_train.shape)
+    print(y_train.shape)
+
+    #np.savez('./../processed_data.npz', x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
+    np.savez('./../nice_leaves.npz', x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
 
 def load_data():
-    data = np.load('./../processed_data.npz')
+    data = np.load('./../nice_leaves.npz')
     x_train = data['x_train']
     y_train = data['y_train']
     x_test = data['x_test']
     y_test = data['y_test']
     return (x_train, y_train), (x_test, y_test)
-
 
 process_data()

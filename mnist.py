@@ -15,7 +15,6 @@ def plot_sample_images(x, y):
     samples = {}
 
     for i in range(len(x)):
-        # Find the class label from the one-hot encoded y array
         label = np.argmax(y[i])
         if label not in samples:
             samples[label] = x[i]
@@ -44,8 +43,9 @@ def preprocess_data(x, y):
 
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
-x_train, y_train = preprocess_data(x_train[:6000], y_train[:6000])
-x_test, y_test = preprocess_data(x_test[:6000], y_test[:6000])
+set_size = 100
+x_train, y_train = preprocess_data(x_train[:set_size], y_train[:set_size])
+x_test, y_test = preprocess_data(x_test[:set_size], y_test[:set_size])
 
 print(x_train.shape)
 print(y_train.shape)
@@ -55,11 +55,9 @@ plot_sample_images(x_train, y_train)
 network = [
     Convolutional((1, 28, 28), 3, 32, activation="relu"),
     MaxPooling((32, 26, 26), 2, 2),
-    Convolutional((32, 13,13), 4, 64, activation="relu"),
-    MaxPooling((64,10,10), 2, 2),
-    Flatten((64,5,5)),
-    Dense(64*5*5, 128, activation="relu"),
-    Dense(128, 10, activation="softmax")
+    Flatten((32,13,13)),
+    Dense(32*13*13, 50, activation="relu"),
+    Dense(50, 10, activation="softmax")
 ]
 
 # network = [
@@ -80,7 +78,5 @@ model.train(report=True)
 count = 0
 for x, y in zip(x_test, y_test):
     output = model.predict(x)
-    # print(output)
-    # print(f"pred: {np.argmax(output)}, true: {np.argmax(y)}")
     count += np.argmax(output) == np.argmax(y)
 print(f"Accuracy: {count / len(x_test)}")
