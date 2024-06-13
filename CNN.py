@@ -29,6 +29,9 @@ class CNN:
     def train(self, batch_size = 8, report = False, snapshot = False):
         
         self.best_accuracy = 0
+        accuracy_train = [0 for _ in range(self.epochs)]
+        accuracy_val = [0 for _ in range(self.epochs)]
+        error_train = [0 for _ in range(self.epochs)]
         for epoch in range(self.epochs):
             error = 0
             count = 0
@@ -40,6 +43,7 @@ class CNN:
             batchX = np.zeros((batch_size, self.X_train.shape[1], self.X_train.shape[2], self.X_train.shape[3]))
             batchY = np.zeros((batch_size, self.y_train.shape[1], self.y_train.shape[2]))
             for x,y in zip(self.X_train, self.y_train):
+                # print(x.shape, y.shape)
                 if report:
                     progress.update(1)
 
@@ -51,6 +55,7 @@ class CNN:
                     batch = 0
 
                     pred = self.predict(batchX)
+                    # print(pred.shape)
                     for i in range(batch_size):
                         error += self.loss.forward(batchY[i], pred[i])
                     for i in range(batch_size):
@@ -82,6 +87,12 @@ class CNN:
                 if val_accuracy > self.best_accuracy:
                     self.best_accuracy = val_accuracy
                     self.save("best_snapshot.npy")
+            
+            accuracy_train[epoch] = count/self.X_train.shape[0]
+            accuracy_val[epoch] = val_accuracy
+            error_train[epoch] = error/self.X_train.shape[0]
+            # print(accuracy_train, accuracy_val, error_train)
+        return accuracy_train, accuracy_val, error_train
 
     
     def number_of_parameters(self):
