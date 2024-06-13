@@ -38,8 +38,6 @@ model = models.Sequential([
     layers.Conv2D(64, (3, 3), activation='relu'),
     layers.MaxPooling2D((2, 2)),
     layers.Conv2D(128, (3, 3), activation='relu'),
-    layers.MaxPooling2D((2, 2)),
-    layers.Conv2D(256, (3, 3), activation='relu'),
     layers.BatchNormalization(),
     layers.MaxPooling2D((2, 2)),
     layers.Flatten(),
@@ -56,14 +54,14 @@ model.compile(
 
 history = model.fit(
     train_generator,
-    epochs=35,
+    epochs=20,
     validation_data=validation_generator,
     callbacks=[callbacks.ModelCheckpoint('best_model.h5', save_best_only=True, monitor='val_accuracy')]
 )
 
-history_filename = 'history_best.pkl'
+history_filename = 'history_less.pkl'
 with open(history_filename, 'wb') as file:
     pickle.dump(history.history, file)
 
 model.load_weights('best_model.h5')
-model.save('second_trainin_full.h5')
+model.save('model_less_convo.h5')
