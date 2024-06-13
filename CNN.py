@@ -8,7 +8,6 @@ class CNN:
     def __init__(self, layers: np.array):
         self.layers = layers
 
-    
     def fit(self, X_train, y_train, X_val, y_val, loss, epochs=100, rate = 0.01):
         self.X_train = X_train
         self.y_train = y_train
@@ -19,6 +18,19 @@ class CNN:
         self.rate = rate
         self.best_accuracy = 0
 
+    def shuffle(self):
+        indices = np.arange(self.X_train.shape[0])
+        np.random.shuffle(indices)
+        self.X_train = self.X_train[indices]
+        self.y_train = self.y_train[indices]
+
+        val_size = self.X_train.shape[0]//8
+        self.X_val = np.array(self.X_train[:val_size])
+        self.y_val = np.array(self.y_train[:val_size])
+        self.X_train = np.array(self.X_train[val_size:])
+        self.y_train = np.array(self.y_train[val_size:])
+
+
     def predict(self, X):
         # print(X)
         for layer in self.layers:
@@ -26,13 +38,16 @@ class CNN:
             # print(X)
         return X
 
-    def train(self, batch_size = 8, report = False, snapshot = False):
+    def train(self, batch_size = 8, report = False, snapshot = True):
         
         self.best_accuracy = 0
         accuracy_train = [0 for _ in range(self.epochs)]
         accuracy_val = [0 for _ in range(self.epochs)]
         error_train = [0 for _ in range(self.epochs)]
         for epoch in range(self.epochs):
+
+            #self.shuffle()
+
             error = 0
             count = 0
             if report:
@@ -68,6 +83,7 @@ class CNN:
                     grad = np.array(grad)
                     for layer in reversed(self.layers):
                         grad = layer.backward(grad, self.rate)
+                        # print(type(layer).__name__,grad.shape)
 
             val_accuracy = 0
             if self.X_val is not None:

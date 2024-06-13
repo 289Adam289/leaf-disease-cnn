@@ -11,19 +11,32 @@ import data
 print(f"x_train shape: {x_train.shape}")
 print(f"y_train shape: {y_train.shape}")
 
+
 network = [
-    Convolutional((3, 128, 128), 3, 5, activation="relu"),
-    MaxPooling((5, 126, 126), 2, 2),
-    Flatten((5,63,63)),
-    Dense(5 * 63*63, 50, activation="relu"),
-    Dense(50, 4, activation="softmax")
+    Convolutional((3, 16, 16),3, 8, activation="relu"),
+    MaxPooling((8, 14, 14), 2, 2),
+    Flatten((8, 7, 7)),
+    Dense(8*7*7, 30, activation="relu"),
+    Dense(30, 2, activation="softmax")
 ]
+
+# network = [
+#     Convolutional((3, 128, 128), 5, 5, activation="relu"),
+#     MaxPooling((5, 124, 124), 4, 4),
+#     Convolutional((5, 31, 31), 4, 5, activation="relu"),
+#     MaxPooling((5, 28, 28), 2, 2),
+#     Convolutional((5,14,14), 3, 10),
+#     MaxPooling((10,12,12),4,4),
+#     Flatten((10, 3, 3)),
+#     Dense(10*3*3, 15, activation="relu"),
+#     Dense(15, 4, activation="softmax")
+# ]
+
 soft = SoftMax()
 
 model = CNN(network)
-model.load('little_epoch_0_1.npy')
-model.fit(x_train, y_train, None, None, Loss("crossentropy"), epochs=20, rate=0.1)
-model.train(report=True)
+model.fit(x_train, y_train, None, None, Loss("crossentropy"), epochs=30, rate=0.001)
+model.train(report=True,batch_size=8)
 
 count = 0
 for x, y in zip(x_test, y_test):
