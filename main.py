@@ -1,5 +1,6 @@
 import numpy as np
-from activation import SoftMax
+from keras.datasets import mnist
+from keras.utils import to_categorical
 from connected import Dense, Convolutional
 from extra import Flatten, MaxPooling
 from CNN import CNN
@@ -8,40 +9,34 @@ import data
 
 (x_train, y_train), (x_test, y_test) = data.load_data()
 
-print(f"x_train shape: {x_train.shape}")
-print(f"y_train shape: {y_train.shape}")
-
+print(x_train.shape)
+print(y_train.shape)
 
 network = [
-    Convolutional((3, 16, 16),3, 8, activation="relu"),
-    MaxPooling((8, 14, 14), 2, 2),
-    Flatten((8, 7, 7)),
-    Dense(8*7*7, 30, activation="relu"),
-    Dense(30, 2, activation="softmax")
+    Convolutional((3, 18, 18), 3, 8, activation="relu"),
+    MaxPooling((8, 16, 16), 2, 2),
+    Flatten((8,8,8)),
+    Dense(8*8*8, 20, activation="relu"),
+    Dense(20, 2, activation="softmax")
 ]
 
-# network = [
-#     Convolutional((3, 128, 128), 5, 5, activation="relu"),
-#     MaxPooling((5, 124, 124), 4, 4),
-#     Convolutional((5, 31, 31), 4, 5, activation="relu"),
-#     MaxPooling((5, 28, 28), 2, 2),
-#     Convolutional((5,14,14), 3, 10),
-#     MaxPooling((10,12,12),4,4),
-#     Flatten((10, 3, 3)),
-#     Dense(10*3*3, 15, activation="relu"),
-#     Dense(15, 4, activation="softmax")
-# ]
-
-soft = SoftMax()
-
 model = CNN(network)
-model.fit(x_train, y_train, None, None, Loss("crossentropy"), epochs=30, rate=0.001)
-model.train(report=True,batch_size=8)
+
+print(model.number_of_parameters())
+
+model.fit(x_train, y_train, x_test, y_test, Loss("crossentropy"), epochs=5, rate=0.005)
+
+
+#model.load("best_snapshotu.npy")
+model.train(report=True, batch_size=1, snapshot=True)
+model.save("leaves5model.npy")
 
 count = 0
 for x, y in zip(x_test, y_test):
-    output = model.predict(x)
+    xx = np.zeros((1, 1, 28, 28))
+    xx[0] = x
+    output = model.predict(xx)
     # print(output)
     # print(f"pred: {np.argmax(output)}, true: {np.argmax(y)}")
-    count += np.argmax(output) == np.argmax(y)
+    count += np.argmax(output[0]) == np.argmax(y)
 print(f"Accuracy: {count / len(x_test)}")

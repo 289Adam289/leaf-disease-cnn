@@ -3,7 +3,7 @@ import numpy as np
 from PIL import Image
 from sklearn.model_selection import train_test_split
 
-def load_images_from_folder(folder, image_size=(16, 16)):
+def load_images_from_folder(folder, image_size=(18, 18)):
     images = []
     for filename in os.listdir(folder):
         img_path = os.path.join(folder, filename)
@@ -29,6 +29,7 @@ def process_data():
         images = load_images_from_folder(folder)
         class_images.append(images)
 
+
     x_train_list = []
     y_train_list = []
 
@@ -39,7 +40,7 @@ def process_data():
 
     for class_idx, images in enumerate(class_images):
         if len(images) > 0:
-            x_train, x_test = train_test_split(images, test_size=0.2, random_state=42)
+            x_train, x_test = train_test_split(images, test_size=0.3, random_state=42)
             x_train_list.extend(x_train)
             y_train_list.extend([np.eye(classes_no)[class_idx][:, np.newaxis]] * len(x_train))
             x_test_list.extend(x_test)
