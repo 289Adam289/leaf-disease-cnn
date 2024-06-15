@@ -33,19 +33,19 @@ num_classes = len(class_names)
 print(class_names)
 
 model = models.Sequential([
-    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(128, 128, 3)),
+    layers.Conv2D(32, (3, 3), activation='sigmoid', input_shape=(128, 128, 3)),
     layers.MaxPooling2D((2, 2)),
-    layers.Conv2D(64, (3, 3), activation='relu'),
+    layers.Conv2D(64, (3, 3), activation='sigmoid'),
     layers.MaxPooling2D((2, 2)),
-    layers.Conv2D(128, (3, 3), activation='relu'),
+    layers.Conv2D(128, (3, 3), activation='sigmoid'),
     layers.MaxPooling2D((2, 2)),
-    layers.Conv2D(256, (3, 3), activation='relu'),
+    layers.Conv2D(256, (3, 3), activation='sigmoid'),
     layers.BatchNormalization(),
     layers.MaxPooling2D((2, 2)),
     layers.Flatten(),
-    layers.Dense(512, activation='relu'),
+    layers.Dense(512, activation='sigmoid'),
     layers.Dropout(0.5),
-    layers.Dense(num_classes, activation='softmax')
+    layers.Dense(num_classes, activation='sigmoid')
 ])
 
 model.compile(
@@ -61,9 +61,9 @@ history = model.fit(
     callbacks=[callbacks.ModelCheckpoint('best_model.h5', save_best_only=True, monitor='val_accuracy')]
 )
 
-history_filename = 'history_best.pkl'
+history_filename = 'history_sigmoid.pkl'
 with open(history_filename, 'wb') as file:
     pickle.dump(history.history, file)
 
 model.load_weights('best_model.h5')
-model.save('second_trainin_full.h5')
+model.save('model_sigmoid.h5')
