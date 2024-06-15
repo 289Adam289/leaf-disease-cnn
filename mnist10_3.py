@@ -6,6 +6,7 @@ from extra import Flatten, MaxPooling
 from CNN import CNN
 from loss import Loss
 
+
 def preprocess_data(x, y, limit):
     indexes = [np.where(y == i)[0][:limit] for i in range(10)]
 
@@ -18,7 +19,8 @@ def preprocess_data(x, y, limit):
     print(y.shape)
     y = y.reshape(len(y), 10, 1)
     return x, y
- 
+
+
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 x_train, y_train = preprocess_data(x_train, y_train, 200)
 x_test, y_test = preprocess_data(x_test, y_test, 100)
@@ -28,9 +30,9 @@ print(y_train.shape)
 network = [
     Convolutional((1, 28, 28), 3, 8, activation="relu"),
     MaxPooling((8, 26, 26), 2, 2),
-    Flatten((8,13,13)),
-    Dense(8*13*13, 50, activation="relu"),
-    Dense(50, 10, activation="softmax")
+    Flatten((8, 13, 13)),
+    Dense(8 * 13 * 13, 50, activation="relu"),
+    Dense(50, 10, activation="softmax"),
 ]
 
 
@@ -42,7 +44,7 @@ model.fit(x_train, y_train, x_test, y_test, Loss("crossentropy"), epochs=55, rat
 
 
 # model.load("mnist10_2/model2.npy")
-acuuracy_train, acu_val, eror =  model.train(report=True, batch_size=1, snapshot=True)
+acuuracy_train, acu_val, eror = model.train(report=True, batch_size=1, snapshot=True)
 
 np.save("mnist10_3/accuracy_train.npy", acuuracy_train)
 np.save("mnist10_3/accuracy_val.npy", acu_val)

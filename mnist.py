@@ -11,6 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from keras.datasets import mnist
 
+
 def plot_sample_images(x, y):
     samples = {}
 
@@ -24,10 +25,11 @@ def plot_sample_images(x, y):
     plt.figure(figsize=(10, 2))
     for i in range(10):
         plt.subplot(1, 10, i + 1)
-        plt.imshow(samples[i].reshape(28, 28), cmap='gray')
+        plt.imshow(samples[i].reshape(28, 28), cmap="gray")
         plt.title(f"Class {i}")
-        plt.axis('off')
+        plt.axis("off")
     plt.show()
+
 
 def preprocess_data(x, y):
     indices = np.random.permutation(len(x))
@@ -36,10 +38,11 @@ def preprocess_data(x, y):
     x = x.reshape(len(x), 1, 28, 28)
     x = x.astype("float32") / 255
 
-    y = to_categorical(y, num_classes=10) 
+    y = to_categorical(y, num_classes=10)
     y = np.array([label[:, np.newaxis] for label in y])
-    
+
     return x, y
+
 
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
@@ -55,9 +58,9 @@ plot_sample_images(x_train, y_train)
 network = [
     Convolutional((1, 28, 28), 3, 32, activation="relu"),
     MaxPooling((32, 26, 26), 2, 2),
-    Flatten((32,13,13)),
-    Dense(32*13*13, 50, activation="relu"),
-    Dense(50, 10, activation="softmax")
+    Flatten((32, 13, 13)),
+    Dense(32 * 13 * 13, 50, activation="relu"),
+    Dense(50, 10, activation="softmax"),
 ]
 
 # network = [
