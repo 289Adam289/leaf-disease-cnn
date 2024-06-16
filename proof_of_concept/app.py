@@ -20,21 +20,18 @@ def predict(image_path, model, class_names):
     predicted_class = np.argmax(predictions, axis=1)
     return class_names[predicted_class[0]]
 
+
 if __name__ == "__main__":
 
     image_path = sys.argv[1]
-    class_names = ['healthy', 'rust', 'scab']
+    class_names = ["healthy", "rust", "scab"]
 
-    print("haha")
-
-    model = tf.keras.models.load_model('simple_cnn_leaf_classifier2.h5')
-
-    print("haha")
+    model = tf.keras.models.load_model("best_model.h5")
 
     prediction = predict(image_path, model, class_names)
-    print(f'Predicted class: {prediction}')
+    print(f"Predicted class: {prediction}")
     img = load_img(image_path)
     plt.imshow(img)
-    plt.title(f'Predicted: {prediction}')
-    plt.axis('off')
+    plt.title(f"Predicted: {prediction}")
+    plt.axis("off")
     plt.show()

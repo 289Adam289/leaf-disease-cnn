@@ -19,10 +19,6 @@ def load_images_from_folder(folder, image_size=(18, 18)):
             print(f"Error loading image {filename}: {e}")
     return np.array(images)
 
-
-data_dir = "./../nice_leaves"
-
-
 def get_leaf(path, image_size=(18, 18)):
     try:
         with Image.open(path) as img:
@@ -32,6 +28,9 @@ def get_leaf(path, image_size=(18, 18)):
     except Exception as e:
         print("Error lading image")
     return img_array
+
+
+data_dir = "./../nice_leaves"
 
 
 def process_data():
@@ -62,10 +61,10 @@ def process_data():
             y_train_list.extend(
                 [np.eye(classes_no)[class_idx][:, np.newaxis]] * len(x_train)
             )
-            x_test_list.extend(x_test)
-            y_test_list.extend(
-                [np.eye(classes_no)[class_idx][:, np.newaxis]] * len(x_test)
+            y_train_list.extend(
+                [np.eye(classes_no)[class_idx][:, np.newaxis]] * len(x_train)
             )
+            x_test_list.extend(x_test)
 
     x_train = np.array(x_train_list)
     y_train = np.array(y_train_list)
@@ -96,6 +95,7 @@ def load_data():
     y_train = data["y_train"]
     x_test = data["x_test"]
     y_test = data["y_test"]
+
     return (x_train, y_train), (x_test, y_test)
 
 

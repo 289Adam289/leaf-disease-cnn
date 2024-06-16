@@ -1,11 +1,10 @@
 import numpy as np
 
 
-
 class Flatten:
     def __init__(self, input_shape):
         self.input_shape = input_shape
-        self.output_shape = (input_shape[0]*input_shape[1]*input_shape[2], 1)
+        self.output_shape = (input_shape[0] * input_shape[1] * input_shape[2], 1)
 
     def forward(self, input):
         batch_size = input.shape[0]
@@ -24,7 +23,8 @@ class Flatten:
 
     def number_of_parameters(self):
         return 0
-    
+
+
 class MaxPooling:
 
     def __init__(self, X_shape, kernel_size, stride):
@@ -36,11 +36,10 @@ class MaxPooling:
         batch_size = X.shape[0]
         self.X = X
 
-        
         channels, height, width = self.X.shape[1], self.X.shape[2], self.X.shape[3]
         new_height = (height - self.kernel_size) // self.stride + 1
         new_width = (width - self.kernel_size) // self.stride + 1
-        self.output = np.zeros((batch_size,channels, new_height, new_width))
+        self.output = np.zeros((batch_size, channels, new_height, new_width))
 
         for sample in range(batch_size):
             for c in range(channels):
@@ -50,15 +49,20 @@ class MaxPooling:
                         h_end = h_start + self.kernel_size
                         w_start = j * self.stride
                         w_end = w_start + self.kernel_size
-                        
-                        self.output[sample, c, i, j] = np.max(X[sample, c, h_start:h_end, w_start:w_end])
-        return self.output
 
+                        self.output[sample, c, i, j] = np.max(
+                            X[sample, c, h_start:h_end, w_start:w_end]
+                        )
+        return self.output
 
     def backward(self, grad, rate):
         batch_size = grad.shape[0]
         dX = [np.zeros(self.X_shape) for _ in range(batch_size)]
-        channels, pooled_height, pooled_width = grad.shape[1], grad.shape[2], grad.shape[3]
+        channels, pooled_height, pooled_width = (
+            grad.shape[1],
+            grad.shape[2],
+            grad.shape[3],
+        )
 
         for sample in range(batch_size):
             for c in range(channels):
@@ -74,8 +78,6 @@ class MaxPooling:
                                 if self.X[sample, c, h, w] == grad[sample, c, i, j]:
                                     dX[sample, c, h, w] += rate
         return np.array(dX)
-    
+
     def number_of_parameters(self):
         return 0
-
-
